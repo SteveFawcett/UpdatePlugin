@@ -2,11 +2,11 @@
 using BroadcastPluginSDK.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
-using UpdatePlugin.Classes;
+using UpdatePlugin.Classes; 
 
-namespace BroadcastPluginSDK.Classes
+namespace UpdatePlugin.Classes
 {
-    public class PluginUpdater : IPluginUpdater
+    public class PluginUpdater 
     {
         private readonly IPluginRegistry _registry;
         private readonly ILogger<IPlugin> _logger;

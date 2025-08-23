@@ -31,10 +31,11 @@
 	</Target>
 
 	<ItemGroup>
-		<PackageReference Include="BroadcastPluginSDK" Version="1.0.6" />
+		<PackageReference Include="BroadcastPluginSDK" Version="1.0.8" />
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="Forms\UpdateForm.cs" />
 	  <Compile Update="Properties\Resources.Designer.cs">
 	    <DesignTime>True</DesignTime>
 	    <AutoGen>True</AutoGen>
