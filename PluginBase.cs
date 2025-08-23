@@ -14,7 +14,7 @@ namespace UpdatePlugin
         private ILogger<IPlugin> _logger;
 
         public UpdatePlugin(IConfiguration configuration, ILogger<IPlugin> logger , IPluginRegistry registry ) :
-            base(configuration, new UpdateForm( logger , registry , configuration  ), Resources.green, Stanza)
+            base(configuration, new UpdateForm( logger , registry , configuration  ), Resources.icon, Stanza)
         {
             _logger = logger;
         }
