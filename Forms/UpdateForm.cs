@@ -15,6 +15,7 @@ public partial class UpdateForm : UserControl , IInfoPage
     private readonly IConfiguration _configuration;
     private readonly IPluginRegistry _registry;
     private readonly PluginUpdater _updates;
+    private ReleaseListItem[] _releases = Array.Empty<ReleaseListItem>();
 
     private ReleaseListItem? selected = null;
 
@@ -76,6 +77,7 @@ public partial class UpdateForm : UserControl , IInfoPage
 
     private void UpdateCombo(ReleaseListItem release)
     {
+
         if (release == null)
         {
             comboBox1.Items.Clear();
@@ -85,7 +87,10 @@ public partial class UpdateForm : UserControl , IInfoPage
             return;
         }
 
-        List<string> versionList = _updates.Versions(release.ShortName);
+        // Fix: Convert array to List before calling Versions extension method
+       
+        var versionList = _releases.ToList().Versions(release.ShortName);
+
         if (versionList == null || versionList.Count == 0)
         {
             comboBox1.Items.Clear();
@@ -109,23 +114,6 @@ public partial class UpdateForm : UserControl , IInfoPage
         }
     }
 
-    private void UpdateForm_Load(object? sender, EventArgs e)
-    {
-        var result = _updates.Latest();
-
-        foreach (var release in result)
-        {
-            if (selected == null )
-            {
-                selected = release;
-                richTextBox1.Rtf = MarkdownToRtfConverter.Convert(release.ReadMe);
-                DisplayLink(release.ReadMeDocUrl);
-                UpdateCombo(release);
-            }
-
-            listBox1.Items.Add(release);
-        }
-    }
 
     //    private async void ListBox1_SelectedIndexChanged(object? sender, EventArgs e)
     private void ListBox1_SelectedIndexChanged(object? sender, EventArgs e)
@@ -155,6 +143,12 @@ public partial class UpdateForm : UserControl , IInfoPage
         }
     }
 
+    private async void UpdateForm_Load(object sender, EventArgs e)
+    {
+        await Task.Delay(100); // Optional: let UI settle
+        RefreshListBoxAsync();
+    }
+
     private void ListBox1_DrawItem(object? sender, DrawItemEventArgs e)
     {
         if (e.Index < 0 || e.Index >= listBox1.Items.Count) return;
@@ -164,6 +158,36 @@ public partial class UpdateForm : UserControl , IInfoPage
 
         e.DrawFocusRectangle();
     }
+
+    private async void RefreshListBoxAsync()
+    {
+        _releases = await _updates.GetReleases( );
+
+        foreach (var release in _releases )
+        {
+            if (selected == null)
+            {
+                selected = release;
+                richTextBox1.Rtf = MarkdownToRtfConverter.Convert(release.ReadMe);
+                DisplayLink(release.ReadMeDocUrl);
+                UpdateCombo(release);
+            }
+
+            listBox1.Items.Add(release);
+        }
+    }
+
+    private void UpdateListBox(IEnumerable<string> items)
+    {
+        listBox1.BeginUpdate();
+        listBox1.Items.Clear();
+        foreach (var item in items)
+        {
+            listBox1.Items.Add(item);
+        }
+        listBox1.EndUpdate();
+    }
+
 
     private void ComboBox1_DrawItem(object sender, DrawItemEventArgs e)
     {
@@ -212,6 +236,7 @@ public partial class UpdateForm : UserControl , IInfoPage
         // Optional: draw focus rectangle
         e.DrawFocusRectangle();
     }
+
 
     public Control GetControl()
     {

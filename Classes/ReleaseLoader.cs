@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net.Http;
+using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -18,111 +19,135 @@ public class ReleaseListItem
     public string ZipName { get; set; } = string.Empty;
     public string DownloadUrl { get; set; } = string.Empty;
     public string ReadMeUrl { get; set; } = string.Empty;
-    public override string ToString() => $"{Repo} - {Version}";
     public string ReadMe { get; internal set; } = string.Empty; // This will hold the HTML content of the README
-}
 
-public class ReleaseInfo
-{
-    public string Repo { get; set; } = string.Empty;
-    public string Tag { get; set; } = string.Empty;
-    public string Name { get; set; } = string.Empty;
-    public string ReadMeUrl { get; set; } = string.Empty;
-    public string ReadMeDocUrl { get; set; } = string.Empty;
-    public DateTime Published { get; set; } = DateTime.Now;
-    public bool IsLatest { get; set; } = false;   
-    public List<ZipFile> ZipFiles { get; set; } = new List<ZipFile>();
-}
-
-public class ZipFile
-{
-    public string Name { get; set; } = string.Empty;
-    public string Url { get; set; } = string.Empty;
-}
-
-public class ReleaseService
-{
-    public Dictionary<string, List<ReleaseInfo>> Releases { get; private set; }
-
-    private ReleaseService(Dictionary<string, List<ReleaseInfo>> releases)
+    public override string ToString()
     {
-        Releases = releases;
+        return $"{Repo} - {Version}";
+    }
+}
+
+public static class ReleaseListExtensions
+{
+    public static List<string> Versions(this List<ReleaseListItem> allItems, string shortName)
+    {
+        return allItems
+            .Where(r => r.ShortName == shortName)
+            .OrderByDescending(r => Version.Parse(r.Version))
+            .Select(r => r.Version).ToList(); // 👈 Project to string
     }
 
-    public static async Task<ReleaseService> CreateAsync( string url )
+    public static ReleaseListItem Latest(this List<ReleaseListItem> allItems, string shortName)
     {
-        var loader = new ReleaseLoader();
-        var releases = await loader.LoadReleasesAsync( url );
-        return new ReleaseService(releases);
+        return allItems
+            .Where(r => r.ShortName == shortName)
+            .OrderByDescending(r => Version.Parse(r.Version))
+            .FirstOrDefault() ?? new ReleaseListItem();
+    }
+}
+
+    public class ReleaseInfo
+    {
+        public string Repo { get; set; } = string.Empty;
+        public string Tag { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public string ReadMeUrl { get; set; } = string.Empty;
+        public string ReadMeDocUrl { get; set; } = string.Empty;
+        public DateTime Published { get; set; } = DateTime.Now;
+        public bool IsLatest { get; set; } = false;
+        public List<ZipFile> ZipFiles { get; set; } = new List<ZipFile>();
     }
 
-    public void print()
+    public class ZipFile
     {
-        foreach (var repo in Releases.Keys)
+        public string Name { get; set; } = string.Empty;
+        public string Url { get; set; } = string.Empty;
+    }
+
+    public class ReleaseService
+    {
+        public Dictionary<string, List<ReleaseInfo>> Releases { get; private set; }
+
+        private ReleaseService(Dictionary<string, List<ReleaseInfo>> releases)
         {
-            Debug.WriteLine($"Repo: {repo}");
-            foreach (var release in Releases[repo])
-            {
-                Debug.WriteLine($"  - {release.Tag} ({(release.IsLatest ? "Latest" : "Old")})");
-                foreach (var zip in release.ZipFiles)
-                {
-                    Debug.WriteLine($"    • {zip.Name} → {zip.Url}");
-                }
-            }
+            Releases = releases;
         }
-    }
 
-    public IEnumerable<ReleaseListItem> GetReleaseItems()
-    {
-        foreach (var repo in Releases.Keys)
+        public static async Task<ReleaseService> CreateAsync(string url)
         {
-            foreach (var release in Releases[repo])
+            var loader = new ReleaseLoader();
+            var releases = await loader.LoadReleasesAsync(url);
+            return new ReleaseService(releases);
+        }
+
+        public void print()
+        {
+            foreach (var repo in Releases.Keys)
             {
-                foreach (var zip in release.ZipFiles)
+                Debug.WriteLine($"Repo: {repo}");
+                foreach (var release in Releases[repo])
                 {
-                    yield return new ReleaseListItem
+                    Debug.WriteLine($"  - {release.Tag} ({(release.IsLatest ? "Latest" : "Old")})");
+                    foreach (var zip in release.ZipFiles)
                     {
-                        Repo = repo,
-                        Version = release.Tag,
-                        IsLatest = release.IsLatest,
-                        ZipName = zip.Name,
-                        DownloadUrl = zip.Url,
-                        ReadMeUrl = release.ReadMeUrl,
-                        ReadMeDocUrl = release.ReadMeDocUrl,
-                        Installed = string.Empty,
-                    };
+                        Debug.WriteLine($"    • {zip.Name} → {zip.Url}");
+                    }
+                }
+            }
+        }
+
+        public IEnumerable<ReleaseListItem> GetReleaseItems()
+        {
+            foreach (var repo in Releases.Keys)
+            {
+                foreach (var release in Releases[repo])
+                {
+                    foreach (var zip in release.ZipFiles)
+                    {
+                        yield return new ReleaseListItem
+                        {
+                            Repo = repo,
+                            Version = release.Tag,
+                            IsLatest = release.IsLatest,
+                            ZipName = zip.Name,
+                            DownloadUrl = zip.Url,
+                            ReadMeUrl = release.ReadMeUrl,
+                            ReadMeDocUrl = release.ReadMeDocUrl,
+                            Installed = string.Empty,
+                            ShortName = repo.Split("/").LastOrDefault() ?? string.Empty ,
+                        };
+                    }
                 }
             }
         }
     }
-}
 
-public class ReleaseLoader
-{
-    public async Task<Dictionary<string, List<ReleaseInfo>>> LoadReleasesAsync(string JsonUrl)
+    public class ReleaseLoader
     {
-        using var httpClient = new HttpClient();
-        var json = await httpClient.GetStringAsync(JsonUrl);
-
-        var releases = JsonSerializer.Deserialize<List<ReleaseInfo>>(json, new JsonSerializerOptions
+        public async Task<Dictionary<string, List<ReleaseInfo>>> LoadReleasesAsync(string JsonUrl)
         {
-            PropertyNameCaseInsensitive = true
-        });
+            using var httpClient = new HttpClient();
+            var json = await httpClient.GetStringAsync(JsonUrl);
 
-        if (releases is null) return new Dictionary<string, List<ReleaseInfo>>(); // Return an empty dictionary instead of null
+            var releases = JsonSerializer.Deserialize<List<ReleaseInfo>>(json, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
 
-        var dict = new Dictionary<string, List<ReleaseInfo>>();
+            if (releases is null) return new Dictionary<string, List<ReleaseInfo>>(); // Return an empty dictionary instead of null
 
-        foreach (var release in releases)
-        {
-            if (!dict.ContainsKey(release.Repo))
-                dict[release.Repo] = new List<ReleaseInfo>();
+            var dict = new Dictionary<string, List<ReleaseInfo>>();
 
-            dict[release.Repo].Add(release);
+            foreach (var release in releases)
+            {
+                if (!dict.ContainsKey(release.Repo))
+                    dict[release.Repo] = new List<ReleaseInfo>();
+
+                dict[release.Repo].Add(release);
+            }
+
+            return dict;
         }
-
-        return dict;
     }
-}
 
 

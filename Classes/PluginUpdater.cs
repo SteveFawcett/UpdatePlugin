@@ -2,7 +2,8 @@
 using BroadcastPluginSDK.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
-using UpdatePlugin.Classes; 
+using UpdatePlugin.Classes;
+using System.Security.Policy;
 
 namespace UpdatePlugin.Classes
 {
@@ -25,8 +26,6 @@ namespace UpdatePlugin.Classes
             _config = config;   
             _releases = Array.Empty<ReleaseListItem>();
 
-            var repository = _config.GetValue<string>("RepositoryUrl") ?? jsonUrl;
-            _logger.LogInformation("Starting Plugin Updater {0}", repository);
 
             _logger.LogDebug( "Currently loaded plugins is {0}", _registry.GetAll().Count);
 
@@ -35,76 +34,24 @@ namespace UpdatePlugin.Classes
                 _logger.LogDebug("Registered plugin: {0}", x.Name);
             }
 
-            _ = Task.Run(async () =>
-            {
-                _releases = await GetReleases(repository);
-                foreach (var release in _releases)
-                {
-                    if (string.IsNullOrWhiteSpace(release.ReadMe))
-                    {
-                        release.ShortName = release.Repo.Split('/').Last() ?? release.Repo;
-
-                        _logger.LogDebug("Fetching README for {0}", release.ShortName);
-                        
-                        release.ReadMe = await GetReadme(release.ReadMeUrl);
-                        
-                        IPlugin? found = _registry.GetAll().FirstOrDefault(p =>
-                            p.ShortName.Equals(release.ShortName, StringComparison.OrdinalIgnoreCase));
-                        
-                        if (found != null)
-                        {
-                            release.Installed = GetInstalled(_registry, release.ShortName);
-                            release.IsLatest = release.Version.Equals(found.Version, StringComparison.OrdinalIgnoreCase);
-                        }
-                        else
-                        {
-                            release.Installed = string.Empty;
-                            release.IsLatest = false;
-                        }
-
-                    }
-                }
-            });
-        }
-        public List<string> Versions(string shortName)
-        {
-            return Releases
-                .Where(r => string.Equals(r.ShortName, shortName, StringComparison.OrdinalIgnoreCase))
-                .Select(r => r.Version)
-                .Distinct() // Optional: remove duplicates
-                .OrderByDescending(v => Version.Parse(v)) // Optional: sort by version descending
-                .ToList();
         }
 
-        public List<ReleaseListItem> Latest()
+        public async Task<ReleaseListItem[]> GetReleases()
         {
-            return Releases
-                .GroupBy(r => r.ShortName)
-                .Select(g => g
-                    .OrderByDescending(r => Version.Parse(r.Version))
-                    .First())
-                .ToList();
-        }
 
-        static string GetInstalled( IPluginRegistry list , string ShortName)
-        {
-            var current = list.GetAll()
-                .FirstOrDefault(p => p.ShortName.Equals(ShortName, StringComparison.OrdinalIgnoreCase))?.Version;
+            string j = _config.GetValue<string>("RepositoryUrl") ?? jsonUrl;
+            _logger.LogInformation("Starting Plugin Updater {0}", j);
 
-            if (string.IsNullOrWhiteSpace(current))
-            {
-                return string.Empty;
-            } 
-
-            return string.Join(".", current.Split('.').Take(3));
-
-        }
-        private async Task<ReleaseListItem[]> GetReleases(string jsonUrl)
-        {
             try
             {
-                var service = await ReleaseService.CreateAsync(jsonUrl);
-                return service.GetReleaseItems().ToArray();
+                var service = await ReleaseService.CreateAsync(j);
+                var _releases =  service.GetReleaseItems().ToArray();
+                foreach (var release in _releases)
+                {
+                    _logger.LogInformation("Processing {name}", release.ShortName);
+                    release.ReadMe = await  GetReadme(release.ReadMeUrl);
+                }
+                return _releases;
             }
             catch (Exception ex)
             {
@@ -118,7 +65,7 @@ namespace UpdatePlugin.Classes
             try
             {
                 // pass the logger to the DownloadStringAsync method
-                string markdown = await DownloadStringAsync(url, _logger ) ?? "# README Not found";
+                string markdown = await DownloadStringAsync(url ) ?? "# README Not found";
                 return markdown;
             }
             catch (Exception ex)
@@ -129,17 +76,17 @@ namespace UpdatePlugin.Classes
         }
 
 
-        public static async Task<string?> DownloadStringAsync(string url, ILogger<IPlugin>? _logger = null, CancellationToken cancellationToken = default)
+        public  async Task<string?> DownloadStringAsync( string url, CancellationToken cancellationToken = default)
         {
             try
             {
                 if (_logger != null)
                 {
-                    _logger.LogInformation("📥 Downloading from URL: {Url}", url);
+                    _logger.LogInformation("📥 Downloading README from URL: {Url}", url);
                 }
                 else
                 {
-                    Console.WriteLine($"📥 Downloading from URL: {url}");
+                    Console.WriteLine($"📥 Downloading README from URL: {url}");
                 }
 
                 var response = await _httpClient.GetAsync(url, cancellationToken);
