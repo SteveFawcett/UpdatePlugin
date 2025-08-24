@@ -44,7 +44,7 @@ namespace UpdatePlugin.Classes
 
             try
             {
-                var service = await ReleaseService.CreateAsync(j);
+                var service = await ReleaseService.CreateAsync( _registry , j);
                 var _releases =  service.GetReleaseItems().ToArray();
                 foreach (var release in _releases)
                 {

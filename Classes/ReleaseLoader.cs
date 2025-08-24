@@ -1,10 +1,12 @@
 ﻿namespace UpdatePlugin.Classes;
 
+using BroadcastPluginSDK.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -26,9 +28,20 @@ public class ReleaseListItem
         return $"{Repo} - {Version}";
     }
 }
-
-public static class ReleaseListExtensions
+public static class ReleaseListItemExtensions
 {
+    public static List<ReleaseListItem> GetLatestByShortName(this IEnumerable<ReleaseListItem> items)
+    {
+        if (items == null) return new List<ReleaseListItem>();
+
+        return items
+            .GroupBy(i => i.ShortName)
+            .Select(g =>
+                g.OrderByDescending(r => Version.Parse(r.Version))
+                .First()
+            )
+            .ToList();
+    }
     public static List<string> Versions(this List<ReleaseListItem> allItems, string shortName)
     {
         return allItems
@@ -66,18 +79,20 @@ public static class ReleaseListExtensions
 
     public class ReleaseService
     {
+        IPluginRegistry _registry;
         public Dictionary<string, List<ReleaseInfo>> Releases { get; private set; }
 
-        private ReleaseService(Dictionary<string, List<ReleaseInfo>> releases)
+        private ReleaseService( IPluginRegistry registry, Dictionary<string, List<ReleaseInfo>> releases)
         {
             Releases = releases;
-        }
+            _registry = registry;
+    }
 
-        public static async Task<ReleaseService> CreateAsync(string url)
+        public static async Task<ReleaseService> CreateAsync( IPluginRegistry registry , string url)
         {
             var loader = new ReleaseLoader();
             var releases = await loader.LoadReleasesAsync(url);
-            return new ReleaseService(releases);
+            return new ReleaseService( registry , releases);
         }
 
         public void print()
@@ -96,11 +111,19 @@ public static class ReleaseListExtensions
             }
         }
 
-        public IEnumerable<ReleaseListItem> GetReleaseItems()
+        public IEnumerable<ReleaseListItem> GetReleaseItems( )
         {
             foreach (var repo in Releases.Keys)
             {
-                foreach (var release in Releases[repo])
+                var version = string.Empty;
+                var ShortName = repo.Split("/").LastOrDefault() ?? string.Empty;
+                IPlugin? plugin = _registry.Get(ShortName);
+                if ( plugin != null )
+                {
+                    version = plugin.Version ?? string.Empty;
+            }
+
+            foreach (var release in Releases[repo])
                 {
                     foreach (var zip in release.ZipFiles)
                     {
@@ -113,8 +136,8 @@ public static class ReleaseListExtensions
                             DownloadUrl = zip.Url,
                             ReadMeUrl = release.ReadMeUrl,
                             ReadMeDocUrl = release.ReadMeDocUrl,
-                            Installed = string.Empty,
-                            ShortName = repo.Split("/").LastOrDefault() ?? string.Empty ,
+                            Installed =  version,
+                            ShortName = ShortName,
                         };
                     }
                 }

@@ -30,7 +30,11 @@
 		<Delete Files="$(PackagePath)" />
 	</Target>
 
-	<ItemGroup>
+	<ItemGroup Condition="'$(Configuration)' == 'Debug'">
+		<ProjectReference Include="..\BroadcastPluginSDK\BroadcastPluginSDK.csproj" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(Configuration)' == 'Release'">
 		<PackageReference Include="BroadcastPluginSDK" Version="1.0.8" />
 	</ItemGroup>
 

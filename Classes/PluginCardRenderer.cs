@@ -56,12 +56,7 @@ namespace UpdatePlugin.Classes
 
             // Badge layout
             int badgeX = cardRect.Right - Padding;
-            int badgeY = cardRect.Y + Padding;
-
-            if (item.IsLatest)
-            {
-                DrawBadge(g, ref badgeY, badgeX, "Latest", Color.ForestGreen, Color.White);
-            }
+            int badgeY = cardRect.Y + Padding + 20;
 
             if (string.IsNullOrEmpty(item.Installed))
             {

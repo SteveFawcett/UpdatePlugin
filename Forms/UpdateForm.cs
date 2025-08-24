@@ -8,7 +8,7 @@ using UpdatePlugin.Classes;
 
 namespace UpdatePlugin.Forms;
 
-public partial class UpdateForm : UserControl , IInfoPage
+public partial class UpdateForm : UserControl, IInfoPage
 {
     private readonly ILogger<IPlugin> _logger;
     private readonly PluginCardRenderer _renderer = new();
@@ -38,14 +38,14 @@ public partial class UpdateForm : UserControl , IInfoPage
             _logger.LogWarning("No URL provided to display link.");
             return;
         }
-        LinkLabel.Link link = new(); 
+        LinkLabel.Link link = new();
         link.LinkData = url;
         link.Start = 0;
         link.Length = linkLabel1.Text.Length;
 
         linkLabel1.Links.Clear();
         linkLabel1.Tag = url;
-        linkLabel1.Links.Add( link);
+        linkLabel1.Links.Add(link);
     }
 
     private void LinkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -88,14 +88,14 @@ public partial class UpdateForm : UserControl , IInfoPage
         }
 
         // Fix: Convert array to List before calling Versions extension method
-       
+
         var versionList = _releases.ToList().Versions(release.ShortName);
 
         if (versionList == null || versionList.Count == 0)
         {
             comboBox1.Items.Clear();
             comboBox1.Text = "No version available";
-            comboBox1.Enabled = false; 
+            comboBox1.Enabled = false;
             _logger.LogWarning("No versions found for the short name: {ShortName}", release.ShortName);
             return;
         }
@@ -129,7 +129,7 @@ public partial class UpdateForm : UserControl , IInfoPage
             }
             else
             {
-                richTextBox1.Rtf = MarkdownToRtfConverter.Convert( "# README not found or failed to load");
+                richTextBox1.Rtf = MarkdownToRtfConverter.Convert("# README not found or failed to load");
                 DisplayLink(selected.Repo);
                 comboBox1.Items.Clear();
                 comboBox1.Text = "No README available";
@@ -161,9 +161,9 @@ public partial class UpdateForm : UserControl , IInfoPage
 
     private async void RefreshListBoxAsync()
     {
-        _releases = await _updates.GetReleases( );
+        _releases = await _updates.GetReleases();
 
-        foreach (var release in _releases )
+        foreach (var release in _releases.GetLatestByShortName())
         {
             if (selected == null)
             {
@@ -175,17 +175,6 @@ public partial class UpdateForm : UserControl , IInfoPage
 
             listBox1.Items.Add(release);
         }
-    }
-
-    private void UpdateListBox(IEnumerable<string> items)
-    {
-        listBox1.BeginUpdate();
-        listBox1.Items.Clear();
-        foreach (var item in items)
-        {
-            listBox1.Items.Add(item);
-        }
-        listBox1.EndUpdate();
     }
 
 

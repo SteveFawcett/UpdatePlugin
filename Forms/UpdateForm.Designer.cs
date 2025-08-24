@@ -21,6 +21,9 @@ namespace UpdatePlugin.Forms
             richTextBox1 = new RichTextBox();
             linkLabel1 = new LinkLabel();
             comboBox1 = new ComboBox();
+            label1 = new Label();
+            pictureBox1 = new PictureBox();
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
             // 
             // listBox1
@@ -73,8 +76,31 @@ namespace UpdatePlugin.Forms
             comboBox1.TabIndex = 5;
             comboBox1.DrawItem += ComboBox1_DrawItem;
             // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Font = new Font("Segoe UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            label1.Location = new Point(71, 16);
+            label1.Name = "label1";
+            label1.Size = new Size(156, 25);
+            label1.TabIndex = 6;
+            label1.Text = "Available PlugIns";
+            // 
+            // pictureBox1
+            // 
+
+            pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
+            pictureBox1.Image = Properties.Resources.icon;
+            pictureBox1.Location = new Point(25, 4);
+            pictureBox1.Name = "pictureBox1";
+            pictureBox1.Size = new Size(40, 40);
+            pictureBox1.TabIndex = 7;
+            pictureBox1.TabStop = false;
+            // 
             // UpdateForm
             // 
+            Controls.Add(pictureBox1);
+            Controls.Add(label1);
             Controls.Add(comboBox1);
             Controls.Add(linkLabel1);
             Controls.Add(richTextBox1);
@@ -82,6 +108,7 @@ namespace UpdatePlugin.Forms
             Name = "UpdateForm";
             Size = new Size(812, 458);
             Load += UpdateForm_Load;
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ResumeLayout(false);
             PerformLayout();
 
@@ -94,5 +121,7 @@ namespace UpdatePlugin.Forms
         private RichTextBox richTextBox1;
         private LinkLabel linkLabel1;
         private ComboBox comboBox1;
+        private Label label1;
+        private PictureBox pictureBox1;
     }
 }
