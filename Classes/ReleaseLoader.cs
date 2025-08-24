@@ -57,6 +57,14 @@ public static class ReleaseListItemExtensions
             .OrderByDescending(r => Version.Parse(r.Version))
             .FirstOrDefault() ?? new ReleaseListItem();
     }
+
+    public static ReleaseListItem Selected(this List<ReleaseListItem> allItems, string shortName , string version)
+    {
+        return allItems
+            .Where(r => r.ShortName == shortName && r.Version == version )
+            .OrderByDescending(r => Version.Parse(r.Version))
+            .FirstOrDefault() ?? new ReleaseListItem();
+    }
 }
 
     public class ReleaseInfo

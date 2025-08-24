@@ -23,6 +23,7 @@ namespace UpdatePlugin.Forms
             comboBox1 = new ComboBox();
             label1 = new Label();
             pictureBox1 = new PictureBox();
+            actionBtn = new Button();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
             // 
@@ -88,17 +89,26 @@ namespace UpdatePlugin.Forms
             // 
             // pictureBox1
             // 
-
-            pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
-            pictureBox1.Image = Properties.Resources.icon;
             pictureBox1.Location = new Point(25, 4);
             pictureBox1.Name = "pictureBox1";
             pictureBox1.Size = new Size(40, 40);
+            pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBox1.TabIndex = 7;
             pictureBox1.TabStop = false;
             // 
+            // actionBtn
+            // 
+            actionBtn.Location = new Point(553, 21);
+            actionBtn.Name = "actionBtn";
+            actionBtn.Size = new Size(141, 24);
+            actionBtn.TabIndex = 8;
+            actionBtn.Text = "button1";
+            actionBtn.UseVisualStyleBackColor = true;
+            actionBtn.Click += actionBtn_Click;
+            // 
             // UpdateForm
             // 
+            Controls.Add(actionBtn);
             Controls.Add(pictureBox1);
             Controls.Add(label1);
             Controls.Add(comboBox1);
@@ -123,5 +133,6 @@ namespace UpdatePlugin.Forms
         private ComboBox comboBox1;
         private Label label1;
         private PictureBox pictureBox1;
+        private Button actionBtn;
     }
 }

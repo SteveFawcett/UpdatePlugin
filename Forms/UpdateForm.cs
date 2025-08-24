@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 using UpdatePlugin.Classes;
+using UpdatePlugin.Properties;
 
 namespace UpdatePlugin.Forms;
 
@@ -29,6 +30,9 @@ public partial class UpdateForm : UserControl, IInfoPage
         _logger.LogInformation("Starting Update Form");
 
         InitializeComponent();
+        UpdateButton(null);
+
+        pictureBox1.Image = Resources.icon;
     }
 
     private void DisplayLink(string? url)
@@ -114,6 +118,33 @@ public partial class UpdateForm : UserControl, IInfoPage
         }
     }
 
+    private void UpdateButton(ReleaseListItem? release)
+    {
+        if (release == null)
+        {
+            actionBtn.Visible = false;
+            actionBtn.Enabled = false;
+            return;
+        }
+        if (string.Equals(release.Installed, release.Version, StringComparison.Ordinal))
+        {
+            actionBtn.Visible = false;
+            actionBtn.Enabled = false;
+            return;
+        }
+        else if (string.IsNullOrEmpty(release.Installed))
+        {
+            actionBtn.Text = "Install";
+            actionBtn.Enabled = true;
+        }
+        else
+        {
+            actionBtn.Text = "Update";
+            actionBtn.Enabled = true;
+        }
+        actionBtn.Visible = true;
+        actionBtn.Enabled = true;
+    }
 
     //    private async void ListBox1_SelectedIndexChanged(object? sender, EventArgs e)
     private void ListBox1_SelectedIndexChanged(object? sender, EventArgs e)
@@ -126,11 +157,13 @@ public partial class UpdateForm : UserControl, IInfoPage
                 richTextBox1.Rtf = MarkdownToRtfConverter.Convert(selected.ReadMe);
                 DisplayLink(selected.ReadMeDocUrl);
                 UpdateCombo(selected);
+                UpdateButton(selected);
             }
             else
             {
                 richTextBox1.Rtf = MarkdownToRtfConverter.Convert("# README not found or failed to load");
                 DisplayLink(selected.Repo);
+                UpdateButton(null);
                 comboBox1.Items.Clear();
                 comboBox1.Text = "No README available";
                 comboBox1.Enabled = false;
@@ -171,6 +204,7 @@ public partial class UpdateForm : UserControl, IInfoPage
                 richTextBox1.Rtf = MarkdownToRtfConverter.Convert(release.ReadMe);
                 DisplayLink(release.ReadMeDocUrl);
                 UpdateCombo(release);
+                UpdateButton(release);
             }
 
             listBox1.Items.Add(release);
@@ -230,5 +264,36 @@ public partial class UpdateForm : UserControl, IInfoPage
     public Control GetControl()
     {
         return this;
+    }
+
+    private void actionBtn_Click(object sender, EventArgs e)
+    {
+
+        if ( sender is not Button btn || selected is null)
+        {
+            _logger.LogWarning("Action button clicked but sender is not a Button or no release selected.");
+            return;
+        }
+
+        if( _releases == null || _releases.Length == 0)
+        {
+            _logger.LogWarning("No releases available to perform action.");
+            return;
+        }
+
+        var SelectedVersion = _releases.ToList().Selected(selected.ShortName, comboBox1.Text) ?? selected;
+
+        if (string.Equals(btn.Text, "Install", StringComparison.OrdinalIgnoreCase))
+        {
+            Downloader.Install( _configuration, _logger , SelectedVersion);
+        }
+        else if (string.Equals(btn.Text, "Update", StringComparison.OrdinalIgnoreCase))
+        {
+            Downloader.Update( _configuration , _logger , SelectedVersion , selected);
+        }
+        else
+        {
+            _logger.LogWarning("Action button clicked with unrecognized text: {ButtonText}", btn.Text);
+        }
     }
 }

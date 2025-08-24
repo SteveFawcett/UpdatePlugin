@@ -35,7 +35,7 @@
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)' == 'Release'">
-		<PackageReference Include="BroadcastPluginSDK" Version="1.0.8" />
+		<PackageReference Include="BroadcastPluginSDK" Version="1.0.10-alpha.0.32" />
 	</ItemGroup>
 
 	<ItemGroup>
