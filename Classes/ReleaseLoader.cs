@@ -128,10 +128,11 @@ public static class ReleaseListItemExtensions
                 IPlugin? plugin = _registry.Get(ShortName);
                 if ( plugin != null )
                 {
-                    version = plugin.Version ?? string.Empty;
+                    var temp = plugin.Version ?? string.Empty;
+                    version = string.Join(".", temp.Split('.').Take(3));
             }
-
-            foreach (var release in Releases[repo])
+                    
+                foreach (var release in Releases[repo])
                 {
                     foreach (var zip in release.ZipFiles)
                     {
