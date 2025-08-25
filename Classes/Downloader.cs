@@ -32,11 +32,7 @@ namespace UpdatePlugin.Classes
 
                 logger.LogInformation("Copying {result} to {destination}", result, installFile);
 
-                if (File.Exists(installFile))
-                {
-                    logger.LogInformation("Existing file {installFile} will be deleted" , installFile);
-                    File.Delete(installFile);
-                }
+                DeleteFiles(selected.ShortName, installPath);
 
                 File.Move(result, installFile);
 
@@ -96,36 +92,22 @@ namespace UpdatePlugin.Classes
             return destinationPath;
         }
 
-        static bool CheckExistingInstallation(ILogger<IPlugin> log, string destinationPath)
+        static void DeleteFiles(string shortName , string destinationPath )
         {
-            log.LogInformation("Checking existing installation at {DestinationPath}", destinationPath);
+            if (string.IsNullOrWhiteSpace(shortName) || string.IsNullOrWhiteSpace(destinationPath))
+                return;
 
-            string? parentDirectory = Path.GetDirectoryName(destinationPath);
-            if (string.IsNullOrWhiteSpace(parentDirectory))
+            string directory = Path.GetDirectoryName(destinationPath) ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(directory) || !Directory.Exists(directory))
+                return;
+
+            string pattern = $"{shortName}-v*.zip";
+
+            foreach (string file in Directory.GetFiles(directory, pattern))
             {
-                log.LogError("Invalid destination path: {DestinationPath}", destinationPath);
-                return false;
+                File.SetAttributes(file, FileAttributes.Normal);
+                File.Delete(file);
             }
-
-            if (!Directory.Exists(parentDirectory))
-            {
-                log.LogInformation("Creating missing directory: {ParentDirectory}", parentDirectory);
-                Directory.CreateDirectory(parentDirectory);
-            }
-
-            if (File.Exists(destinationPath))
-            {
-                log.LogInformation("File already exists at {DestinationPath}", destinationPath);
-                var attributes = File.GetAttributes(destinationPath);
-                if ((attributes & FileAttributes.ReadOnly) == FileAttributes.ReadOnly)
-                {
-                    log.LogWarning("File at {DestinationPath} is read-only.", destinationPath);
-                    return false;
-                }
-            }
-
-            return true;
         }
-
     }
 }
