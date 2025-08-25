@@ -269,13 +269,13 @@ public partial class UpdateForm : UserControl, IInfoPage
     private void actionBtn_Click(object sender, EventArgs e)
     {
 
-        if ( sender is not Button btn || selected is null)
+        if (sender is not Button btn || selected is null)
         {
             _logger.LogWarning("Action button clicked but sender is not a Button or no release selected.");
             return;
         }
 
-        if( _releases == null || _releases.Length == 0)
+        if (_releases == null || _releases.Length == 0)
         {
             _logger.LogWarning("No releases available to perform action.");
             return;
@@ -285,15 +285,32 @@ public partial class UpdateForm : UserControl, IInfoPage
 
         if (string.Equals(btn.Text, "Install", StringComparison.OrdinalIgnoreCase))
         {
-            Downloader.Install( _configuration, _logger , SelectedVersion);
+            _ = Downloader.Install(_configuration, _logger, SelectedVersion);
+            _registry.Restart = true;
         }
         else if (string.Equals(btn.Text, "Update", StringComparison.OrdinalIgnoreCase))
         {
-            Downloader.Update( _configuration , _logger , SelectedVersion , selected);
+            _ = Downloader.Install(_configuration, _logger, SelectedVersion);
+            _registry.Restart = true;
         }
         else
         {
             _logger.LogWarning("Action button clicked with unrecognized text: {ButtonText}", btn.Text);
+        }
+    }
+
+    private void Restart_Click(object sender, EventArgs e)
+    {
+        _logger.LogInformation("Restart requested by user.");
+
+        if (_registry.Get("UpdatePlugin") is UpdatePlugin manager)
+        {
+            _logger.LogDebug("Plugin {Name} supports restart via IManager.", "UpdatePlugin");
+            manager.RequestRestart(true);
+        }
+        else
+        {
+            _logger.LogWarning("Plugin 'UpdatePlugin' does not implement IManager. Restart skipped.");
         }
     }
 }

@@ -24,6 +24,7 @@ namespace UpdatePlugin.Forms
             label1 = new Label();
             pictureBox1 = new PictureBox();
             actionBtn = new Button();
+            Restart = new Button();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
             // 
@@ -106,8 +107,19 @@ namespace UpdatePlugin.Forms
             actionBtn.UseVisualStyleBackColor = true;
             actionBtn.Click += actionBtn_Click;
             // 
+            // Restart
+            // 
+            Restart.Location = new Point(694, 415);
+            Restart.Name = "Restart";
+            Restart.Size = new Size(94, 23);
+            Restart.TabIndex = 10;
+            Restart.Text = "Restart";
+            Restart.UseVisualStyleBackColor = true;
+            Restart.Click += Restart_Click;
+            // 
             // UpdateForm
             // 
+            Controls.Add(Restart);
             Controls.Add(actionBtn);
             Controls.Add(pictureBox1);
             Controls.Add(label1);
@@ -134,5 +146,6 @@ namespace UpdatePlugin.Forms
         private Label label1;
         private PictureBox pictureBox1;
         private Button actionBtn;
+        private Button Restart;
     }
 }

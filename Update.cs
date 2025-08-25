@@ -7,7 +7,7 @@ using UpdatePlugin.Forms;
 
 namespace UpdatePlugin
 {
-    public class UpdatePlugin : BroadcastPluginBase
+    public class UpdatePlugin : BroadcastPluginBase , IManager
     {
 
         private const string Stanza = "YOUR CONFIG STANZA";
@@ -17,6 +17,14 @@ namespace UpdatePlugin
             base(configuration, new UpdateForm( logger , registry , configuration  ), Resources.icon, Stanza)
         {
             _logger = logger;
+        }
+
+        public event EventHandler<bool>? TriggerRestart;
+
+        public void RequestRestart(bool isForced)
+        {
+            _logger.LogDebug("Requesting application restart. Forced: {IsForced}", isForced);
+            TriggerRestart?.Invoke(this, isForced);
         }
     }
 }

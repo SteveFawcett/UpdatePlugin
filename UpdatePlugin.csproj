@@ -7,7 +7,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<GenerateAssemblyInfo>true</GenerateAssemblyInfo>
 		<PackageDir Condition="'$(PackageDir)' == ''">$([System.IO.Path]::Combine($(OutputPath),'package'))/</PackageDir>
-		<OutputDirectory>.</OutputDirectory>
+		<OutputDirectory>../ZippedPlugins</OutputDirectory>
 		<AssemblyVersion>0.0.0</AssemblyVersion>
 		<PackageFileName>$(AssemblyName)-v$(AssemblyVersion).zip</PackageFileName>
 		<PackagePath>$(OutputDirectory)\$(PackageFileName)</PackagePath>
@@ -20,12 +20,26 @@
 		<PackageIcon>airplane.png</PackageIcon>
 		<PackageProjectUrl>https://github.com/SteveFawcett/TestPlugin</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/SteveFawcett/TestPlugin</RepositoryUrl>
+		<ApplicationManifest>app.manifest</ApplicationManifest>
 	</PropertyGroup>
 
-	<Target Name="Package" DependsOnTargets="Publish">
+	<ItemGroup>
+		<Content Include="$(PackagePath)">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToPublishDirectory>Always</CopyToPublishDirectory>
+		</Content>
+	</ItemGroup>
+	
+	<Target Name="AutoPackage" AfterTargets="Publish">
+		<Message Importance="High" Text="📦 Packaging plugin to $(PackagePath)" />
 		<MakeDir Directories="$(PackageDir)" />
 		<ZipDirectory Overwrite="true" SourceDirectory="$(MSBuildProjectDirectory)/$(PublishDir)" DestinationFile="$(PackagePath)" />
+		<Copy SourceFiles="$(PackagePath)" DestinationFolder="$(MSBuildProjectDirectory)/$(PublishDir)" />
+		<Copy SourceFiles="$(PackagePath)" DestinationFolder="$(AppData)/Broadcast/Plugins" Condition="'$(Configuration)' == 'Debug'" />
+		<Message Importance="High" Text="📦 Copying package $(AppData)/Broadcast/Plugins"  Condition="'$(Configuration)' == 'Debug'" />
 	</Target>
+
+		
 	<Target Name="PackageClean" AfterTargets="Clean">
 		<Delete Files="$(PackagePath)" />
 	</Target>
@@ -35,7 +49,11 @@
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)' == 'Release'">
-		<PackageReference Include="BroadcastPluginSDK" Version="1.0.10-alpha.0.32" />
+		<PackageReference Include="BroadcastPluginSDK" Version="1.0.16" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\BroadcastPluginSDK\BroadcastPluginSDK.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
