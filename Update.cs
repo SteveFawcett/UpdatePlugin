@@ -11,18 +11,19 @@ namespace UpdatePlugin
     public class UpdatePlugin : BroadcastPluginBase , IManager
     {
 
-        private const string Stanza = "YOUR CONFIG STANZA";
         private ILogger<IPlugin> _logger;
         private static UpdateForm? _updateForm;
         private static ConfigForm? _configForm ;
         private IConfiguration _configuration;
+        private IPluginRegistry _registry;
         public List<ToolStripItem>? ContextMenuItems { get; set; } = null;
 
         public UpdatePlugin(IConfiguration configuration, ILogger<IPlugin> logger , IPluginRegistry registry ) :
-            base(configuration, CreateForm( logger , registry , configuration  ), Resources.icon, Stanza)
+            base(configuration, CreateForm( logger , registry , configuration  ), Resources.icon, null )
         {
             _logger = logger;
             _configuration = configuration;
+            _registry = registry;
 
             ContextMenuItems = new List<ToolStripItem>()
             {
@@ -39,7 +40,12 @@ namespace UpdatePlugin
 
         public event EventHandler<bool>? TriggerRestart;
         public event EventHandler<UserControl>? ShowScreen;
+        public event EventHandler? WriteConfiguration;
 
+        public void ConfigurationDump()
+        {
+            WriteConfiguration?.Invoke(this, EventArgs.Empty  );
+        }
         public void RequestRestart(bool isForced)
         {
             _logger.LogDebug("Requesting application restart. Forced: {IsForced}", isForced);
@@ -54,7 +60,7 @@ namespace UpdatePlugin
 
         private void OnConfigurationClicked(object? sender, EventArgs e)
         {
-            _configForm = new( _configuration );
+            _configForm = new( _configuration , _registry , _logger);
             if (_configForm != null)
                 ShowScreen?.Invoke(this, _configForm);
         }

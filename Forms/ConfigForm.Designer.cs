@@ -33,6 +33,7 @@
             label2 = new Label();
             textBox2 = new TextBox();
             label3 = new Label();
+            button1 = new Button();
             SuspendLayout();
             // 
             // label1
@@ -78,17 +79,28 @@
             label3.Text = "Install Path :";
             label3.TextAlign = ContentAlignment.TopRight;
             // 
+            // button1
+            // 
+            button1.Location = new Point(522, 168);
+            button1.Name = "button1";
+            button1.Size = new Size(75, 23);
+            button1.TabIndex = 5;
+            button1.Text = "Save";
+            button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click;
+            // 
             // ConfigForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            Controls.Add(button1);
             Controls.Add(label3);
             Controls.Add(textBox2);
             Controls.Add(label2);
             Controls.Add(textBox1);
             Controls.Add(label1);
             Name = "ConfigForm";
-            Size = new Size(636, 241);
+            Size = new Size(607, 210);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -100,5 +112,6 @@
         private Label label2;
         private TextBox textBox2;
         private Label label3;
+        private Button button1;
     }
 }
