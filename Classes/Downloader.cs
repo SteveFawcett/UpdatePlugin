@@ -12,7 +12,7 @@ namespace UpdatePlugin.Classes
 
         public static async Task Install(IConfiguration config, ILogger<IPlugin> logger, ReleaseListItem selected)
         {
-            var installPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) ,  "broadcast" , "plugins"  );
+            var installPath = config["PluginInstallPath"];
             var semaphore = _installLocks.GetOrAdd(selected.ShortName, _ => new SemaphoreSlim(1, 1));
             await semaphore.WaitAsync();
 
