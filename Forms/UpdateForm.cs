@@ -31,6 +31,7 @@ public partial class UpdateForm : UserControl, IInfoPage
 
         InitializeComponent();
         UpdateButton(null);
+        ButtonStatus();
 
         pictureBox1.Image = Resources.icon;
     }
@@ -283,6 +284,8 @@ public partial class UpdateForm : UserControl, IInfoPage
 
         var SelectedVersion = _releases.ToList().Selected(selected.ShortName, comboBox1.Text) ?? selected;
 
+        ButtonStatus(false);
+
         if (string.Equals(btn.Text, "Install", StringComparison.OrdinalIgnoreCase))
         {
             _ = Downloader.Install(_configuration, _logger, SelectedVersion);
@@ -297,8 +300,27 @@ public partial class UpdateForm : UserControl, IInfoPage
         {
             _logger.LogWarning("Action button clicked with unrecognized text: {ButtonText}", btn.Text);
         }
+
+        ButtonStatus();
     }
 
+    private void ButtonStatus( bool active = true )
+    {
+        if (_registry.Restart && active )
+        {
+            Restart.Visible = true;
+            Restart.Enabled = true;
+            Restart.BackColor = SystemColors.Control;
+            Restart.ForeColor = SystemColors.ControlText;
+        }
+        else
+        {
+            Restart.Visible = false;
+            Restart.Enabled = false;
+            Restart.BackColor = SystemColors.ControlDark;
+            Restart.ForeColor = SystemColors.GrayText;
+        }
+    }
     private void Restart_Click(object sender, EventArgs e)
     {
         _logger.LogInformation("Restart requested by user.");
