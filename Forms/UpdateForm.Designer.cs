@@ -78,12 +78,12 @@ namespace UpdatePlugin.Forms
             comboBox1.TabIndex = 5;
             comboBox1.DrawItem += ComboBox1_DrawItem;
             // 
-            // label1
+            // lblTitle
             // 
             label1.AutoSize = true;
             label1.Font = new Font("Segoe UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
             label1.Location = new Point(71, 16);
-            label1.Name = "label1";
+            label1.Name = "lblTitle";
             label1.Size = new Size(156, 25);
             label1.TabIndex = 6;
             label1.Text = "Available PlugIns";
@@ -103,7 +103,7 @@ namespace UpdatePlugin.Forms
             actionBtn.Name = "actionBtn";
             actionBtn.Size = new Size(141, 24);
             actionBtn.TabIndex = 8;
-            actionBtn.Text = "button1";
+            actionBtn.Text = "btnSave";
             actionBtn.UseVisualStyleBackColor = true;
             actionBtn.Click += actionBtn_Click;
             // 
