@@ -65,7 +65,7 @@ jobs:
       run: mkdir -Force "${{ env.OutputDirectory }}"
 
     - name: Package into ZIP
-      run: dotnet msbuild -t:Package 
+      run: dotnet msbuild
              -restore
              -p:Configuration=${{ matrix.configuration }} 
              -p:OutputDirectory="${{ env.OutputDirectory }}" 
