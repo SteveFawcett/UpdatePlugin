@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
+using UpdatePlugin.Classes;
 using UpdatePlugin.Properties;
 
 namespace UpdatePlugin.Forms
@@ -104,46 +105,4 @@ namespace UpdatePlugin.Forms
         }
     }
 
-    public static class ButtonExtensions
-    {
-        // LRU cache for faded images to prevent unbounded memory growth
-        private const int ImageCacheCapacity = 100;
-        private static readonly Dictionary<(Image, float), LinkedListNode<CacheItem>> _imageCache = new();
-        private static readonly LinkedList<CacheItem> _lruList = new();
-
-        private class CacheItem
-        {
-            public (Image, float) Key { get; }
-            public Image Value { get; }
-            public CacheItem((Image, float) key, Image value)
-            {
-                Key = key;
-                Value = value;
-            }
-        }
-
-        public static void SetOpacity(this Button button, Image image, float opacity)
-        {
-            if (image == null) return;
-
-            var key = (image, opacity);
-            if (!_imageCache.TryGetValue(key, out var node))
-            {
-                var faded = new Bitmap(image.Width, image.Height);
-                using (Graphics g = Graphics.FromImage(faded))
-                {
-                    ColorMatrix matrix = new ColorMatrix { Matrix33 = Math.Clamp(opacity, 0f, 1f) };
-                    ImageAttributes attributes = new ImageAttributes();
-                    attributes.SetColorMatrix(matrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
-
-                    g.DrawImage(image, new Rectangle(0, 0, faded.Width, faded.Height),
-                        0, 0, image.Width, image.Height, GraphicsUnit.Pixel, attributes);
-                }
-                _imageCache[key] = faded;
-            }
-
-            button.BackgroundImage = faded;
-            button.BackgroundImageLayout = ImageLayout.Stretch;
-        }
-    }
 }
