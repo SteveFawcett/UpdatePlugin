@@ -106,16 +106,30 @@ namespace UpdatePlugin.Forms
 
     public static class ButtonExtensions
     {
-        private static readonly Dictionary<(Image, float), Image> _imageCache = new();
+        // LRU cache for faded images to prevent unbounded memory growth
+        private const int ImageCacheCapacity = 100;
+        private static readonly Dictionary<(Image, float), LinkedListNode<CacheItem>> _imageCache = new();
+        private static readonly LinkedList<CacheItem> _lruList = new();
+
+        private class CacheItem
+        {
+            public (Image, float) Key { get; }
+            public Image Value { get; }
+            public CacheItem((Image, float) key, Image value)
+            {
+                Key = key;
+                Value = value;
+            }
+        }
 
         public static void SetOpacity(this Button button, Image image, float opacity)
         {
             if (image == null) return;
 
             var key = (image, opacity);
-            if (!_imageCache.TryGetValue(key, out var faded))
+            if (!_imageCache.TryGetValue(key, out var node))
             {
-                faded = new Bitmap(image.Width, image.Height);
+                var faded = new Bitmap(image.Width, image.Height);
                 using (Graphics g = Graphics.FromImage(faded))
                 {
                     ColorMatrix matrix = new ColorMatrix { Matrix33 = Math.Clamp(opacity, 0f, 1f) };
