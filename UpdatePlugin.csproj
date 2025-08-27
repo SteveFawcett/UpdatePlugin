@@ -30,7 +30,7 @@
 		</Content>
 	</ItemGroup>
 
-	<Target Name="AutoPackage" AfterTargets="Build">
+	<Target Name="AutoPackage" AfterTargets="Publish">
 		<Message Importance="High" Text="📦 Packaging plugin to $(PackagePath)" />
 		<MakeDir Directories="$(PackageDir)" />
 		<ZipDirectory Overwrite="true" SourceDirectory="$(MSBuildProjectDirectory)/$(PublishDir)" DestinationFile="$(PackagePath)" />
