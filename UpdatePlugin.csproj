@@ -8,7 +8,7 @@
 		<GenerateAssemblyInfo>true</GenerateAssemblyInfo>
 		<AssemblyVersion>0.0.0</AssemblyVersion>
 		
-		<OutputDirectory>../ZippedPlugins</OutputDirectory>
+		<OutputDirectory>C:\Users\steve\AppData\Roaming\Broadcast\Plugins\</OutputDirectory>
 		<PackageDir Condition="'$(PackageDir)' == ''">$([System.IO.Path]::Combine($(OutputDirectory),''))/</PackageDir>
 		<PackageFileName>$(AssemblyName)-v$(AssemblyVersion).zip</PackageFileName>
 		<PackagePath>$(PackageDir)\$(PackageFileName)</PackagePath>
@@ -56,6 +56,11 @@
 
 	<ItemGroup>
 	  <Content Remove="../ZippedPlugins\UpdatePlugin-v0.0.0.zip" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include=".github\dependabot.yml" />
+	  <None Include=".github\workflows\build.yml" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -147,7 +147,6 @@ public partial class UpdateForm : UserControl, IInfoPage
         actionBtn.Enabled = true;
     }
 
-    //    private async void ListBox1_SelectedIndexChanged(object? sender, EventArgs e)
     private void ListBox1_SelectedIndexChanged(object? sender, EventArgs e)
     {
         if (listBox1.SelectedItem is ReleaseListItem selected)
