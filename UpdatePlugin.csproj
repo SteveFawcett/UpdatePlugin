@@ -25,13 +25,14 @@
 		<ApplicationManifest>app.manifest</ApplicationManifest>
 	</PropertyGroup>
 
-	<Target Name="AutoPackage" AfterTargets="Build">
+	<Target Name="AutoPackage" AfterTargets="Publish">
 		<Message Importance="High" Text="📦 Packaging plugin to $(PackagePath)" />
 		<MakeDir Directories="$(PackageDir)" />
 		<ZipDirectory Overwrite="true" SourceDirectory="$(MSBuildProjectDirectory)/$(PublishDir)" DestinationFile="$(PackagePath)" />
+		
 		<Message Importance="High" Text="📦 Copying package from $(PackagePath) To $(MSBuildProjectDirectory)/$(PublishDir) " />
-
 		<Copy SourceFiles="$(PackagePath)" DestinationFolder="$(MSBuildProjectDirectory)/$(PublishDir)" />
+		
 		<Copy SourceFiles="$(PackagePath)" DestinationFolder="$(AppData)/Broadcast/Plugins" Condition="'$(Configuration)' == 'Debug'" />
 		<Message Importance="High" Text="📦 Copying package $(AppData)/Broadcast/Plugins" Condition="'$(Configuration)' == 'Debug'" />
 
