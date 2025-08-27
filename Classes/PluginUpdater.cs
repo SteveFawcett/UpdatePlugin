@@ -26,7 +26,6 @@ namespace UpdatePlugin.Classes
             _config = config;   
             _releases = Array.Empty<ReleaseListItem>();
 
-
             _logger.LogDebug( "Currently loaded plugins is {0}", _registry.GetAll().Count);
 
             foreach ( IPlugin x in _registry.GetAll())
@@ -38,7 +37,6 @@ namespace UpdatePlugin.Classes
 
         public async Task<ReleaseListItem[]> GetReleases()
         {
-
             string j = _config.GetValue<string>("RepositoryUrl") ?? jsonUrl;
             _logger.LogInformation("Starting Plugin Updater {0}", j);
 

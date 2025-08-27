@@ -55,10 +55,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Content Remove="../ZippedPlugins\UpdatePlugin-v0.0.0.zip" />
-	</ItemGroup>
-
-	<ItemGroup>
 	  <None Include=".github\dependabot.yml" />
 	  <None Include=".github\workflows\build.yml" />
 	</ItemGroup>

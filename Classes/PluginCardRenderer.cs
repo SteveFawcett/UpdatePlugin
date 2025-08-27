@@ -62,13 +62,17 @@ namespace UpdatePlugin.Classes
             {
                 DrawBadge(g, ref badgeY, badgeX, "Not Installed", Color.ForestGreen, Color.White);
             }
-            else if (item.Installed == item.Version)
+            else if (ReleaseListItemExtensions.SafeParseVersion( item.Installed ) == ReleaseListItemExtensions.SafeParseVersion(item.Version))
             {
                 DrawBadge(g, ref badgeY, badgeX, "Current", Color.White, Color.Gray);
             }
-            else
+            else if (ReleaseListItemExtensions.SafeParseVersion(item.Installed) > ReleaseListItemExtensions.SafeParseVersion(item.Version))
             {
-                DrawBadge(g, ref badgeY, badgeX, "Update Available", Color.Blue, Color.White);
+                DrawBadge(g, ref badgeY, badgeX, "Downgrade", Color.DarkBlue, Color.White);
+            }
+            else 
+            {
+                DrawBadge(g, ref badgeY, badgeX, "Update Available", Color.ForestGreen, Color.White);
             }
         }
 
