@@ -37,11 +37,7 @@ public static class ReleaseListItemExtensions
         return items
             .GroupBy(i => i.ShortName)
             .Select(g =>
-                g.OrderByDescending(r =>
-                {
-                    Version parsed;
-                    return Version.TryParse(r.Version, out parsed) ? parsed : new Version(0, 0);
-                })
+                g.OrderByDescending(r => SafeParseVersion(r.Version))
                 .First()
             )
             .ToList();
