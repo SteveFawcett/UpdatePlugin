@@ -15,7 +15,7 @@ namespace UpdatePlugin.Classes
             var installPath = config["PluginInstallPath"] ?? string.Empty;
             if(string.IsNullOrWhiteSpace(installPath))
             {
-                installPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Broadcast\plugins";
+                installPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Broadcast", "plugins");
                 logger.LogWarning("PluginInstallPath is not configured. setting to {path}" , installPath );
                 config["PluginInstallPath"] = installPath;
             }
