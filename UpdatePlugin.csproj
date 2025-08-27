@@ -8,7 +8,7 @@
 		<GenerateAssemblyInfo>true</GenerateAssemblyInfo>
 		<AssemblyVersion>0.0.0</AssemblyVersion>
 		
-		<OutputDirectory>C:\Users\steve\AppData\Roaming\Broadcast\Plugins\</OutputDirectory>
+		<OutputDirectory>$(AppData)\Broadcast\Plugins\</OutputDirectory>
 		<PackageDir Condition="'$(PackageDir)' == ''">$([System.IO.Path]::Combine($(OutputDirectory),''))/</PackageDir>
 		<PackageFileName>$(AssemblyName)-v$(AssemblyVersion).zip</PackageFileName>
 		<PackagePath>$(PackageDir)\$(PackageFileName)</PackagePath>
