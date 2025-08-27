@@ -30,6 +30,12 @@ public class ReleaseListItem
 }
 public static class ReleaseListItemExtensions
 {
+    public static Version SafeParseVersion(string version)
+    {
+        Version? parsed;
+        return Version.TryParse(version, out parsed) ? parsed : new Version(0, 0);
+    }
+
     public static List<ReleaseListItem> GetLatestByShortName(this IEnumerable<ReleaseListItem> items)
     {
         if (items == null) return new List<ReleaseListItem>();
@@ -46,11 +52,7 @@ public static class ReleaseListItemExtensions
     {
         return allItems
             .Where(r => r.ShortName == shortName)
-            .OrderByDescending(r =>
-            {
-               Version parsed;
-               return Version.TryParse(r.Version, out parsed) ? parsed : new Version(0, 0);
-            })
+            .OrderByDescending(r => SafeParseVersion(r.Version))
             .Select(r => r.Version).ToList(); // 👈 Project to string
     }
 
@@ -58,11 +60,7 @@ public static class ReleaseListItemExtensions
     {
         return allItems
             .Where(r => r.ShortName == shortName)
-            .OrderByDescending(r =>
-            {
-                Version parsed;
-                return Version.TryParse(r.Version, out parsed) ? parsed : new Version(0, 0);
-            })
+            .OrderByDescending(r => SafeParseVersion(r.Version))
             .FirstOrDefault() ?? new ReleaseListItem();
     }
 
@@ -70,11 +68,7 @@ public static class ReleaseListItemExtensions
     {
         return allItems
             .Where(r => r.ShortName == shortName && r.Version == version )
-            .OrderByDescending(r =>
-            {
-                Version parsed;
-                return Version.TryParse(r.Version, out parsed) ? parsed : new Version(0, 0);
-            })
+            .OrderByDescending(r => SafeParseVersion(r.Version))
             .FirstOrDefault() ?? new ReleaseListItem();
     }
 }
