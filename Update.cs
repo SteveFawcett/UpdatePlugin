@@ -17,6 +17,7 @@ namespace UpdatePlugin
         private IConfiguration _configuration;
         private IPluginRegistry _registry;
         public List<ToolStripItem>? ContextMenuItems { get; set; } = null;
+        public bool Locked { get; set;  } = false;
 
         public UpdatePlugin(IConfiguration configuration, ILogger<IPlugin> logger , IPluginRegistry registry ) :
             base(configuration, CreateForm( logger , registry , configuration  ), Resources.icon, null )
@@ -34,7 +35,7 @@ namespace UpdatePlugin
 
         private static UpdateForm CreateForm(ILogger<IPlugin> logger, IPluginRegistry registry, IConfiguration config)
         {
-            _updateForm = new UpdateForm(logger, registry, config);
+            _updateForm = new UpdateForm(logger, registry, config );
             return _updateForm;
         }
 

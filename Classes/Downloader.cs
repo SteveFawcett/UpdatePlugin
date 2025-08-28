@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Collections.Concurrent;
+using UpdatePlugin.Forms;
 
 
 namespace UpdatePlugin.Classes
@@ -10,8 +11,9 @@ namespace UpdatePlugin.Classes
     {
         private static readonly ConcurrentDictionary<string, SemaphoreSlim> _installLocks = new();
 
-        public static async Task Install(IConfiguration config, ILogger<IPlugin> logger, ReleaseListItem selected)
+        public static async Task Install(UpdateForm parent , IConfiguration config, ILogger<IPlugin> logger, ReleaseListItem selected)
         {
+            
             var installPath = config["PluginInstallPath"] ?? string.Empty;
             if(string.IsNullOrWhiteSpace(installPath))
             {
@@ -25,6 +27,7 @@ namespace UpdatePlugin.Classes
 
             try
             {
+                parent.Locked = true;
                 logger.LogInformation("Starting download of plugin: {ShortName} ", selected.ShortName);
                 var result = await DownloadAndInstall(logger, selected.DownloadUrl);
                 logger.LogInformation("Download completed for plugin: {ShortName}", selected.ShortName);
@@ -44,11 +47,13 @@ namespace UpdatePlugin.Classes
                 File.Move(result, installFile);
 
                 logger.LogInformation("Installation process completed for plugin: {ShortName}", selected.ShortName);
+                parent.Locked = false;
             }
             finally
             {
                 semaphore.Release();
                 _installLocks.TryRemove(selected.ShortName, out _);
+                parent.Locked = false;
             }
         }
 
