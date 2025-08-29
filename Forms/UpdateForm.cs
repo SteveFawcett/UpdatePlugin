@@ -17,10 +17,11 @@ public partial class UpdateForm : UserControl, IInfoPage
     private readonly IPluginRegistry _registry;
     private readonly PluginUpdater _updates;
     private ReleaseListItem[] _releases = Array.Empty<ReleaseListItem>();
+    public bool Locked { get; set; } = false;
 
     private ReleaseListItem? selected = null;
 
-    public UpdateForm(ILogger<IPlugin> logger, IPluginRegistry registry, IConfiguration configuration)
+    public UpdateForm(ILogger<IPlugin> logger, IPluginRegistry registry, IConfiguration configuration  )
     {
         _logger = logger;
         _registry = registry;
@@ -211,7 +212,6 @@ public partial class UpdateForm : UserControl, IInfoPage
         }
     }
 
-
     private void ComboBox1_DrawItem(object sender, DrawItemEventArgs e)
     {
         if (e.Index < 0) return;
@@ -287,12 +287,12 @@ public partial class UpdateForm : UserControl, IInfoPage
 
         if (string.Equals(btn.Text, "Install", StringComparison.OrdinalIgnoreCase))
         {
-            _ = Downloader.Install(_configuration, _logger, SelectedVersion);
+            _ = Downloader.Install( this , _configuration, _logger, SelectedVersion);
             _registry.Restart = true;
         }
         else if (string.Equals(btn.Text, "Update", StringComparison.OrdinalIgnoreCase))
         {
-            _ = Downloader.Install(_configuration, _logger, SelectedVersion);
+            _ = Downloader.Install(this , _configuration, _logger, SelectedVersion);
             _registry.Restart = true;
         }
         else
