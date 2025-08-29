@@ -33,10 +33,7 @@
 		<Message Importance="High" Text="📦 Packaging plugin to $(PackagePath)" />
 		<MakeDir Directories="$(PackageDir)" />
 
-		<ItemGroup>
-			<ZipFilesToDelete Include="$(MSBuildProjectDirectory)/$(PublishDir)**\*.zip" />
-		</ItemGroup>
-		<Message Importance="High" Text="📦 Remove any old zip files " />
+		<Message Importance="High" Text="📦 Remove any old zip files" />
 		<Delete Files="@(ZipFilesToDelete)" />
 		
 		<ZipDirectory Overwrite="true" SourceDirectory="$(MSBuildProjectDirectory)/$(PublishDir)" DestinationFile="$(PackagePath)" />
