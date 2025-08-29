@@ -18,6 +18,8 @@ namespace UpdatePlugin
         private IPluginRegistry _registry;
         public List<ToolStripItem>? ContextMenuItems { get; set; } = null;
 
+        public UpdatePlugin() : base() { }
+
         public UpdatePlugin(IConfiguration configuration, ILogger<IPlugin> logger , IPluginRegistry registry ) :
             base(configuration, CreateForm( logger , registry , configuration  ), Resources.icon, null )
         {
