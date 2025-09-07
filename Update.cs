@@ -2,20 +2,19 @@
 using BroadcastPluginSDK.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using UpdatePlugin.Properties;
 using UpdatePlugin.Forms;
-using BroadcastPluginSDK;
+using UpdatePlugin.Properties;
 
 namespace UpdatePlugin
 {
     public class UpdatePlugin : BroadcastPluginBase , IManager
     {
 
-        private ILogger<IPlugin> _logger;
+        private ILogger<IPlugin>? _logger;
         private static UpdateForm? _updateForm;
         private static ConfigForm? _configForm ;
-        private IConfiguration _configuration;
-        private IPluginRegistry _registry;
+        private IConfiguration? _configuration;
+        private IPluginRegistry? _registry;
         public List<ToolStripItem>? ContextMenuItems { get; set; } = null;
         public bool Locked { get; set;  } = false;
 
@@ -51,7 +50,7 @@ namespace UpdatePlugin
         }
         public void RequestRestart(bool isForced)
         {
-            _logger.LogDebug("Requesting application restart. Forced: {IsForced}", isForced);
+            _logger?.LogDebug("Requesting application restart. Forced: {IsForced}", isForced);
             TriggerRestart?.Invoke(this, isForced);
         }
 
