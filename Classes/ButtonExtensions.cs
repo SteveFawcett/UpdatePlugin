@@ -2,7 +2,6 @@
 
 namespace UpdatePlugin.Classes
 {
-
     public static class ButtonExtensions
     {
         private const int ImageCacheCapacity = 100;
