@@ -68,6 +68,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\CyberDog\CyberDog.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <Compile Update="Forms\UpdateForm.cs" />
 	  <Compile Update="Properties\Resources.Designer.cs">
 	    <DesignTime>True</DesignTime>

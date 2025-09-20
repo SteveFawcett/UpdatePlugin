@@ -1,5 +1,8 @@
 ﻿
+using CyberDog.Controls;
+using System.Data;
 using System.Security.Policy;
+using UpdatePlugin.Classes;
 
 namespace UpdatePlugin.Forms
 {
@@ -17,7 +20,7 @@ namespace UpdatePlugin.Forms
         /// </summary>
         private void InitializeComponent()
         {
-            listBox1 = new ListBox();
+            listBox1 = new ListPanel<ReleaseListItem>();
             richTextBox1 = new RichTextBox();
             linkLabel1 = new LinkLabel();
             comboBox1 = new ComboBox();
@@ -32,17 +35,11 @@ namespace UpdatePlugin.Forms
             // 
             listBox1.BackColor = Color.White;
             listBox1.BorderStyle = BorderStyle.None;
-            listBox1.DrawMode = DrawMode.OwnerDrawFixed;
-            listBox1.Font = new Font("Segoe UI", 12F);
-            listBox1.FormattingEnabled = true;
-            listBox1.ItemHeight = 72;
             listBox1.Location = new Point(20, 50);
             listBox1.Margin = new Padding(0);
             listBox1.Name = "listBox1";
             listBox1.Size = new Size(330, 360);
             listBox1.TabIndex = 0;
-            listBox1.DrawItem += ListBox1_DrawItem;
-            listBox1.SelectedIndexChanged += ListBox1_SelectedIndexChanged;
             // 
             // richTextBox1
             // 
@@ -139,7 +136,7 @@ namespace UpdatePlugin.Forms
 
         #endregion
 
-        private ListBox listBox1;
+        private ListPanel<ReleaseListItem> listBox1;
         private RichTextBox richTextBox1;
         private LinkLabel linkLabel1;
         private ComboBox comboBox1;

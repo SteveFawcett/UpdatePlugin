@@ -7,8 +7,9 @@ using System.Diagnostics;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+using CyberDog.Interfaces;
 
-public class ReleaseListItem
+public class ReleaseListItem : IUpdatableItem
 {
     public string Repo { get; set; } = string.Empty;
     public string Version { get; set; } = string.Empty;
@@ -20,6 +21,9 @@ public class ReleaseListItem
     public string DownloadUrl { get; set; } = string.Empty;
     public string ReadMeUrl { get; set; } = string.Empty;
     public string ReadMe { get; internal set; } = string.Empty; // This will hold the HTML content of the README
+
+    public string Key { get => $"{ShortName}-{Version}"; set { } }
+    public string Value { get => Version; set => Version = value; }
 
     public override string ToString()
     {

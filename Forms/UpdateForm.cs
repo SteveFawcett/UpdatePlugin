@@ -1,6 +1,7 @@
 ﻿using Broadcast.Classes;
 using BroadcastPluginSDK.Classes;
 using BroadcastPluginSDK.Interfaces;
+using CyberDog.Controls;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
@@ -34,6 +35,7 @@ public partial class UpdateForm : UserControl, IInfoPage
         UpdateButton(null);
         ButtonStatus();
 
+        listBox1.OnItemSelected += ListBox1_SelectedIndexChanged;   
         pictureBox1.Image = Resources.icon;
     }
 
@@ -148,49 +150,33 @@ public partial class UpdateForm : UserControl, IInfoPage
         actionBtn.Enabled = true;
     }
 
-    private void ListBox1_SelectedIndexChanged(object? sender, EventArgs e)
+    private void ListBox1_SelectedIndexChanged(object? sender, SelectedItems<ReleaseListItem> e)
     {
-        if (listBox1.SelectedItem is ReleaseListItem selected)
+        foreach (ReleaseListItem Selected in e.Items)
         {
-            this.selected = selected;
-            if (!string.IsNullOrWhiteSpace(selected.ReadMe))
+            if (!string.IsNullOrWhiteSpace(Selected.ReadMe))
             {
-                richTextBox1.Rtf = MarkdownToRtfConverter.Convert(selected.ReadMe);
-                DisplayLink(selected.ReadMeDocUrl);
-                UpdateCombo(selected);
-                UpdateButton(selected);
+                richTextBox1.Rtf = MarkdownToRtfConverter.Convert(Selected.ReadMe);
+                DisplayLink(Selected.ReadMeDocUrl);
+                UpdateCombo(Selected);
+                UpdateButton(Selected);
             }
             else
             {
                 richTextBox1.Rtf = MarkdownToRtfConverter.Convert("# README not found or failed to load");
-                DisplayLink(selected.Repo);
+                DisplayLink(Selected.Repo);
                 UpdateButton(null);
                 comboBox1.Items.Clear();
                 comboBox1.Text = "No README available";
                 comboBox1.Enabled = false;
             }
         }
-        else
-        {
-            _logger.LogWarning("Selected item is not a ReleaseListItem");
-            richTextBox1.Rtf = MarkdownToRtfConverter.Convert("# README not found or failed to load");
-        }
     }
-
+ 
     private async void UpdateForm_Load(object sender, EventArgs e)
     {
         await Task.Delay(100); // Optional: let UI settle
         RefreshListBoxAsync();
-    }
-
-    private void ListBox1_DrawItem(object? sender, DrawItemEventArgs e)
-    {
-        if (e.Index < 0 || e.Index >= listBox1.Items.Count) return;
-
-        var item = (ReleaseListItem)listBox1.Items[e.Index];
-        _renderer.Draw(e.Graphics, e.Bounds, item, (e.State & DrawItemState.Selected) != 0);
-
-        e.DrawFocusRectangle();
     }
 
     private async void RefreshListBoxAsync()
@@ -208,7 +194,7 @@ public partial class UpdateForm : UserControl, IInfoPage
                 UpdateButton(release);
             }
 
-            listBox1.Items.Add(release);
+            listBox1.AddUpdateItem(release);
         }
     }
 
