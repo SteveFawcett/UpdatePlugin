@@ -63,7 +63,7 @@ namespace UpdatePlugin
         private void OnConfigurationClicked(object? sender, EventArgs e)
         {
             if (_configForm == null)
-                _configForm = new(_configuration, _registry, _logger);
+                _configForm = new(_configuration!, _registry!, _logger!);
             if (_configForm != null)
                 ShowScreen?.Invoke(this, _configForm);
         }

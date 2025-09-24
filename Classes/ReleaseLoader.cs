@@ -22,12 +22,12 @@ public class ReleaseListItem : IUpdatableItem
     public string ReadMeUrl { get; set; } = string.Empty;
     public string ReadMe { get; internal set; } = string.Empty; // This will hold the HTML content of the README
 
-    public string Key { get => $"{ShortName}-{Version}"; set { } }
+    public string Key { get => $"{ShortName}"; set { } }
     public string Value { get => Version; set => Version = value; }
 
     public override string ToString()
     {
-        return $"{Repo} - {Version}";
+        return $"{Repo}";
     }
 }
 public static class ReleaseListItemExtensions
